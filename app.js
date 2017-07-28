@@ -1,8 +1,12 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
-var db = mongoose.connect('mongodb://demo:123456789@ds050879.mlab.com:50879/standupmeetingnotes');
+var db;
 
+if(process.env.ENV == 'Test') 
+	db = mongoose.connect('mongodb://demo:123456789@ds050879.mlab.com:50879/standupmeetingnotes_test');
+else
+	db = mongoose.connect('mongodb://demo:123456789@ds050879.mlab.com:50879/standupmeetingnotes');
 var Book = require('./models/bookModel');
 // var Author = require('./models/authorModel');
 
@@ -26,3 +30,5 @@ app.get('/', function(req,res){
 app.listen(port, function(){
 	console.log('Gulp is running my project on port 8000!');
 });
+
+module.exports = app;

@@ -3,28 +3,11 @@ var express = require('express');
 
 var routes = function (Book) {
     var bookRouter = express.Router();
+    var bookController = require('../controllers/bookController')(Book);
 
     bookRouter.route('/')
-        .post(function (req, res) {
-            var book = new Book(req.body);
-
-            book.save();
-            res.status(201).send(book);
-        })
-        .get(function (req, res) {
-            var query = {};
-
-            if (req.query.genre) {
-                query.genre = req.query.genre;
-            }
-
-            Book.find(query, function (err, books) {
-                if (err)
-                    res.status(500).send(err);
-                else
-                    res.json(books);
-            });
-        });
+        .post(bookController.post)
+        .get(bookController.get);
     //call the  middle by using use method
     bookRouter.use('/:bookId', function (req, res, next) {
         // get item by parameters 
@@ -42,8 +25,13 @@ var routes = function (Book) {
     })
     bookRouter.route('/:bookId')
         .get(function (req, res) {
+            var returnBook = req.book.toJSON();
+            returnBook.link = {};
 
-            res.json(req.book);
+var newLink =  'http://' + req.headers.host + '/api/books/?genre=' + returnBook.genre;
+
+            returnBook.link.FilterByThisGenre = newLink.replace(' ', '%20');
+            res.json(returnBook);
 
         })
         .put(function (req, res) {
